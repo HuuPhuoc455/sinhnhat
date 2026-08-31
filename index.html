@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Phương Tuyền</title>
+  <style>
+    :root {
+      --pink: #ff6b9d;
+      --pink-deep: #e83a7a;
+      --text: #7a2f4f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      background: linear-gradient(160deg, #ffe9f2 0%, #fff0f5 45%, #fff5e8 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ===== MÀN NHẬP NGÀY SINH ===== */
+    .lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #ffe4ef, #ffd0e3);
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+    }
+    .lock-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .lock-card {
+      width: min(92vw, 480px);
+      background: #fff;
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: 0 25px 50px rgba(220, 100, 150, 0.25);
+      display: flex;
+      gap: 16px;
+    }
+
+    .lock-photo {
+      width: 42%;
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+      flex-shrink: 0;
+    }
+    .lock-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .lock-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px;
+    }
+
+    .lock-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #c2185b;
+      text-align: center;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .date-display {
+      height: 42px;
+      background: #fff5f8;
+      border: 1.5px solid #ffb6c9;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #ad1457;
+      margin-bottom: 12px;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .key {
+      height: 42px;
+      border: none;
+      border-radius: 12px;
+      background: #fff0f5;
+      color: #ad1457;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #ffc0d4;
+    }
+    .key:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #ffc0d4;
+    }
+    .key.clear { background: #ffe0e8; }
+
+    .error-msg {
+      text-align: center;
+      color: #d32f2f;
+      font-size: 0.85rem;
+      font-weight: 600;
+      min-height: 20px;
+      margin-top: 8px;
+    }
+
+    /* ===== TRANG THIỆP ===== */
+    .card-page {
+      display: none;
+      min-height: 100vh;
+      padding: 30px 16px 50px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-page.show { display: flex; }
+
+    .top-badge {
+      background: white;
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-weight: 800;
+      color: var(--pink-deep);
+      box-shadow: 0 8px 20px rgba(255, 120, 170, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .envelope-closed {
+      width: min(90vw, 380px);
+      height: 230px;
+      background: linear-gradient(160deg, #5ec8e8, #3aa8d0);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 700;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+    .envelope-closed:hover {
+      transform: scale(1.02);
+    }
+    .envelope-closed::after {
+      content: "♥";
+      font-size: 2.5rem;
+      margin-top: 12px;
+    }
+    .envelope-closed.hide {
+      opacity: 0;
+      transform: scale(0.85);
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .wish-card {
+      width: min(90vw, 400px);
+      background: white;
+      border-radius: 20px;
+      border: 2px solid #ffb6c9;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      padding: 28px 22px;
+      text-align: center;
+      display: none;
+      animation: showWish 0.5s ease forwards;
+    }
+    .wish-card.show {
+      display: block;
+    }
+
+    .wish-card h2 {
+      font-size: 1.75rem;
+      color: var(--pink-deep);
+      margin-bottom: 4px;
+    }
+    .wish-card .age {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #c2185b;
+      margin-bottom: 16px;
+    }
+    .wish-card p {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #6d2c4a;
+      margin-bottom: 10px;
+    }
+    .wish-card .highlight {
+      color: var(--pink-deep);
+      font-weight: 700;
+    }
+
+    .next-btn {
+      margin-top: 28px;
+      padding: 13px 34px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff8cb3, #ff5d9e);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 12px 25px rgba(255, 100, 155, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s ease;
+    }
+    .next-btn.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ===== TRANG BÁNH + ẢNH ===== */
+    .photo-page {
+      display: none;
+      min-height: 100vh;
+      padding: 20px 12px 40px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-page.show { display: flex; }
+
+    .photo-page h2 {
+      font-size: 1.45rem;
+      color: var(--pink-deep);
+      margin-bottom: 16px;
+      z-index: 20;
+    }
+
+    .scene {
+      position: relative;
+      width: min(96vw, 540px);
+      height: 540px;
+    }
+
+    /* BÁNH KEM */
+    .cake {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 280px;
+      height: 280px;
+      z-index: 10;
+      animation: cakeFloat 4s ease-in-out infinite alternate;
+    }
+
+    .cake-layer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 16px;
+    }
+
+    .cake .base {
+      bottom: 0;
+      width: 270px;
+      height: 78px;
+      background: linear-gradient(180deg, #ffb6d1 0%, #ff8ab8 100%);
+      box-shadow: inset 0 -12px 0 rgba(255,255,255,0.25), 0 8px 20px rgba(255, 100, 150, 0.25);
+    }
+
+    .cake .middle {
+      bottom: 68px;
+      width: 210px;
+      height: 62px;
+      background: linear-gradient(180deg, #ffc9df 0%, #ff9ec8 100%);
+      box-shadow: inset 0 -8px 0 rgba(255,255,255,0.2);
+    }
+
+    .cake .top {
+      bottom: 120px;
+      width: 155px;
+      height: 52px;
+      background: linear-gradient(180deg, #fff0f6 0%, #ffd6e8 100%);
+      box-shadow: inset 0 -6px 0 rgba(255,255,255,0.25);
+    }
+
+    .icing-drip {
+      position: absolute;
+      bottom: 128px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 155px;
+      height: 22px;
+      background: linear-gradient(180deg, #fff8e6 0%, #ffe9b0 100%);
+      border-radius: 999px;
+      box-shadow: 0 6px 0 rgba(255,255,255,0.3);
+    }
+    .icing-drip::before,
+    .icing-drip::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 28px;
+      background: linear-gradient(180deg, #fff8e6, #ffe9b0);
+      border-radius: 0 0 50% 50%;
+      top: 12px;
+    }
+    .icing-drip::before { left: 18px; }
+    .icing-drip::after  { right: 18px; }
+
+    .cherry {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff9eb5, #e6396e 70%);
+      box-shadow: inset -3px -2px 0 rgba(0,0,0,0.1);
+      z-index: 5;
+    }
+    .cherry.c1 { bottom: 85px; left: 28%; }
+    .cherry.c2 { bottom: 85px; left: 48%; }
+    .cherry.c3 { bottom: 85px; left: 68%; }
+    .cherry.c4 { bottom: 145px; left: 50%; transform: translateX(-50%); }
+
+    .candle {
+      position: absolute;
+      bottom: 168px;
+      width: 11px;
+      height: 36px;
+      background: linear-gradient(180deg, #fffaf0 0%, #ffe6a0 100%);
+      border-radius: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+    }
+    .candle1 { left: 32%; }
+    .candle2 { left: 50%; }
+    .candle3 { left: 68%; }
+
+    .candle::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -18px;
+      width: 16px;
+      height: 22px;
+      transform: translateX(-50%);
+      border-radius: 50% 50% 40% 40%;
+      background: radial-gradient(circle at 50% 30%, #fff9d0 0%, #ffd65a 40%, #ff9a30 100%);
+      box-shadow: 0 0 16px rgba(255, 200, 80, 0.95);
+      animation: flicker 0.85s ease-in-out infinite alternate;
+    }
+    .candle2::after { animation-delay: 0.3s; }
+    .candle3::after { animation-delay: 0.6s; }
+
+    /* Ảnh xung quanh */
+    .around-photo {
+      position: absolute;
+      width: 105px;
+      height: 130px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 3px solid white;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+      background: #fce4ec;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.9s cubic-bezier(0.22, 0.9, 0.3, 1);
+      z-index: 5;
+    }
+    .around-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .around-photo.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .p1 { top: 0;     left: 50%;  margin-left: -52px; }
+    .p2 { top: 90px;  left: 5px; }
+    .p3 { top: 90px;  right: 5px; }
+    .p4 { bottom: 90px; left: 15px; }
+    .p5 { bottom: 90px; right: 15px; }
+    .p6 { bottom: 0;  left: 50%;  margin-left: -52px; }
+
+    /* ===== HIỆU ỨNG BAY LÊN RẤT NHIỀU ===== */
+    .floating-decor {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      pointer-events: none;
+      animation: floatUp 5s ease-in-out infinite;
+      z-index: 3;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(40px) scale(0.5) rotate(0deg);
+        opacity: 0;
+      }
+      15% { opacity: 0.95; }
+      85% { opacity: 0.6; }
+      100% {
+        transform: translateY(-220px) scale(1.2) rotate(30deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes cakeFloat {
+      from { transform: translate(-50%, -50%) translateY(0); }
+      to   { transform: translate(-50%, -50%) translateY(-12px); }
+    }
+    @keyframes flicker {
+      from { transform: translateX(-50%) scale(0.88) rotate(-6deg); }
+      to   { transform: translateX(-50%) scale(1.12) rotate(5deg); }
+    }
+    @keyframes showWish {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="bgMusic" loop>
+    <source src="music/sinh-nhat.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- 1. MÀN NHẬP NGÀY SINH -->
+  <div class="lock-screen" id="lockScreen">
+    <div class="lock-card">
+      <div class="lock-photo">
+        <img src="img/your-photo.jpg" alt="" onerror="this.style.display='none'" />
+      </div>
+      <div class="lock-right">
+        <div class="lock-title">Hãy nhập ngày sinh<br>của công chúa</div>
+        <div class="date-display" id="dateDisplay">____/__/____</div>
+        <div class="keypad" id="keypad">
+          <button class="key" data-num="1">1</button>
+          <button class="key" data-num="2">2</button>
+          <button class="key" data-num="3">3</button>
+          <button class="key" data-num="4">4</button>
+          <button class="key" data-num="5">5</button>
+          <button class="key" data-num="6">6</button>
+          <button class="key" data-num="7">7</button>
+          <button class="key" data-num="8">8</button>
+          <button class="key" data-num="9">9</button>
+          <button class="key clear" data-num="C">C</button>
+          <button class="key" data-num="0">0</button>
+          <button class="key" data-num="OK">OK</button>
+        </div>
+        <div class="error-msg" id="errorMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TRANG THIỆP -->
+  <div class="card-page" id="cardPage">
+    <div class="top-badge">♥ Happy Birthday ♥</div>
+
+    <div class="envelope-closed" id="envelopeClosed">
+      Nhấn để mở thiệp
+    </div>
+
+    <div class="wish-card" id="wishCard">
+      <h2>Phương Tuyền</h2>
+      <div class="age">20 tuổi</div>
+      <p>Hôm nay là ngày đặc biệt của bạn – ngày mà thế giới này trở nên rực rỡ hơn vì có bạn.</p>
+      <p><span class="highlight">Chúc bạn</span> luôn tươi cười, mạnh mẽ và hạnh phúc mỗi ngày. Mong những điều đẹp nhất sẽ đến với bạn.</p>
+      <p>Hãy cứ vững tin và bước tiếp trên con đường mình chọn. Dù có lúc mệt mỏi, hãy nhớ rằng bạn luôn xứng đáng được yêu thương.</p>
+      <p class="highlight" style="margin-top:12px;font-size:1.15rem">Happy Birthday! 🎂</p>
+    </div>
+
+    <button class="next-btn" id="nextBtn">Nhấp vào</button>
+  </div>
+
+  <!-- 3. TRANG BÁNH + ẢNH -->
+  <div class="photo-page" id="photoPage">
+    <h2>Những khoảnh khắc đẹp</h2>
+
+    <div class="scene">
+      <!-- Rất nhiều hiệu ứng bay lên -->
+      <div class="floating-decor" style="left: 5%;  bottom: 30px;  animation-delay: 0s;    font-size: 18px;">⭐</div>
+      <div class="floating-decor" style="left: 12%; bottom: 50px;  animation-delay: 0.4s;  font-size: 22px;">🌸</div>
+      <div class="floating-decor" style="left: 18%; bottom: 20px;  animation-delay: 0.9s;  font-size: 16px;">💖</div>
+      <div class="floating-decor" style="left: 25%; bottom: 70px;  animation-delay: 1.3s;  font-size: 20px;">✨</div>
+      <div class="floating-decor" style="left: 32%; bottom: 40px;  animation-delay: 1.8s;  font-size: 18px;">🌟</div>
+      <div class="floating-decor" style="left: 68%; bottom: 35px;  animation-delay: 0.2s;  font-size: 20px;">💕</div>
+      <div class="floating-decor" style="left: 75%; bottom: 55px;  animation-delay: 0.7s;  font-size: 18px;">🌸</div>
+      <div class="floating-decor" style="left: 82%; bottom: 25px;  animation-delay: 1.2s;  font-size: 22px;">⭐</div>
+      <div class="floating-decor" style="left: 88%; bottom: 65px;  animation-delay: 1.6s;  font-size: 16px;">💖</div>
+      <div class="floating-decor" style="left: 94%; bottom: 45px;  animation-delay: 2.1s;  font-size: 20px;">✨</div>
+
+      <div class="floating-decor" style="left: 8%;  bottom: 120px; animation-delay: 0.5s;  font-size: 18px;">🌟</div>
+      <div class="floating-decor" style="left: 15%; bottom: 150px; animation-delay: 1.0s;  font-size: 16px;">🌸</div>
+      <div class="floating-decor" style="left: 78%; bottom: 130px; animation-delay: 0.3s;  font-size: 20px;">💖</div>
+      <div class="floating-decor" style="left: 85%; bottom: 160px; animation-delay: 1.5s;  font-size: 18px;">⭐</div>
+      <div class="floating-decor" style="left: 92%; bottom: 110px; animation-delay: 2.0s;  font-size: 22px;">✨</div>
+
+      <div class="floating-decor" style="left: 3%;  bottom: 200px; animation-delay: 0.8s;  font-size: 16px;">💕</div>
+      <div class="floating-decor" style="left: 10%; bottom: 230px; animation-delay: 1.4s;  font-size: 20px;">🌸</div>
+      <div class="floating-decor" style="left: 80%; bottom: 210px; animation-delay: 0.6s;  font-size: 18px;">⭐</div>
+      <div class="floating-decor" style="left: 90%; bottom: 240px; animation-delay: 1.9s;  font-size: 16px;">💖</div>
+
+      <!-- Ảnh -->
+      <div class="around-photo p1"><img src="img/your-photo.jpg" onerror="this.style.display='none'" /></div>
+      <div class="around-photo p2"><img src="img/anh2.jpg" onerror="this.style.display='none'" /></div>
+      <div class="around-photo p3"><img src="img/anh3.jpg" onerror="this.style.display='none'" /></div>
+      <div class="around-photo p4"><img src="img/anh4.jpg" onerror="this.style.display='none'" /></div>
+      <div class="around-photo p5"><img src="img/anh5.jpg" onerror="this.style.display='none'" /></div>
+      <div class="around-photo p6"><img src="img/your-photo.jpg" onerror="this.style.display='none'" /></div>
+
+      <!-- Bánh kem -->
+      <div class="cake">
+        <div class="cake-layer base"></div>
+        <div class="cake-layer middle"></div>
+        <div class="cake-layer top"></div>
+        <div class="icing-drip"></div>
+        <div class="cherry c1"></div>
+        <div class="cherry c2"></div>
+        <div class="cherry c3"></div>
+        <div class="cherry c4"></div>
+        <div class="candle candle1"></div>
+        <div class="candle candle2"></div>
+        <div class="candle candle3"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const correct = "03092006";
+    let input = "";
+
+    const dateDisplay = document.getElementById("dateDisplay");
+    const errorMsg    = document.getElementById("errorMsg");
+    const lockScreen  = document.getElementById("lockScreen");
+    const cardPage    = document.getElementById("cardPage");
+    const photoPage   = document.getElementById("photoPage");
+    const envelopeClosed = document.getElementById("envelopeClosed");
+    const wishCard    = document.getElementById("wishCard");
+    const nextBtn     = document.getElementById("nextBtn");
+    const bgMusic     = document.getElementById("bgMusic");
+
+    document.getElementById("keypad").addEventListener("click", (e) => {
+      const btn = e.target.closest(".key");
+      if (!btn) return;
+      const val = btn.dataset.num;
+
+      if (val === "C") {
+        input = "";
+        updateDisplay();
+        errorMsg.textContent = "";
+        return;
+      }
+      if (val === "OK") {
+        checkDate();
+        return;
+      }
+      if (input.length < 8) {
+        input += val;
+        updateDisplay();
+      }
+    });
+
+    function updateDisplay() {
+      let d = input.padEnd(8, "_");
+      dateDisplay.textContent = `${d[0]}${d[1]}/${d[2]}${d[3]}/${d[4]}${d[5]}${d[6]}${d[7]}`;
+    }
+
+    function checkDate() {
+      if (input === correct) {
+        lockScreen.classList.add("hidden");
+        cardPage.classList.add("show");
+        errorMsg.textContent = "";
+      } else {
+        errorMsg.textContent = "Sai rồi! Hãy nhập đúng 03/09/2006";
+        input = "";
+        updateDisplay();
+      }
+    }
+
+    envelopeClosed.addEventListener("click", () => {
+      envelopeClosed.classList.add("hide");
+      wishCard.classList.add("show");
+      bgMusic.play().catch(() => {});
+      setTimeout(() => {
+        nextBtn.classList.add("show");
+      }, 5000);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      cardPage.classList.remove("show");
+      photoPage.classList.add("show");
+      document.querySelectorAll(".around-photo").forEach((p, i) => {
+        setTimeout(() => p.classList.add("show"), 150 + i * 140);
+      });
+    });
+  </script>
+</body>
+</html>
