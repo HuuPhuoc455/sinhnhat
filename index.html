@@ -261,15 +261,23 @@
     }
 
     /* BÁNH KEM */
-  .cake {
-  position: relative;       /* đặt trong scene, không absolute */
-  margin: 20px auto;        /* căn giữa */
-  width: 220px;             /* kích thước mặc định */
-  height: 220px;
+  /* ===== BÁNH KEM ===== */
+.cake-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   animation: cakeFloat 4s ease-in-out infinite alternate;
-  z-index: 5;               /* thấp hơn ảnh để không che */
+  z-index: 10;
 }
 
+.cake {
+  width: 220px;
+  height: 220px;
+  position: relative;
+}
+
+/* Các tầng bánh */
 .cake-layer {
   position: absolute;
   left: 50%;
@@ -300,6 +308,102 @@
   background: linear-gradient(180deg, #fff0f6 0%, #ffd6e8 100%);
   box-shadow: inset 0 -6px 0 rgba(255,255,255,0.25);
 }
+
+/* Kem chảy */
+.icing-drip {
+  position: absolute;
+  bottom: 128px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 155px;
+  height: 22px;
+  background: linear-gradient(180deg, #fff8e6 0%, #ffe9b0 100%);
+  border-radius: 999px;
+  box-shadow: 0 6px 0 rgba(255,255,255,0.3);
+}
+.icing-drip::before,
+.icing-drip::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 28px;
+  background: linear-gradient(180deg, #fff8e6, #ffe9b0);
+  border-radius: 0 0 50% 50%;
+  top: 12px;
+}
+.icing-drip::before { left: 18px; }
+.icing-drip::after  { right: 18px; }
+
+/* Cherry */
+.cherry {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ff9eb5, #e6396e 70%);
+  box-shadow: inset -3px -2px 0 rgba(0,0,0,0.1);
+  z-index: 5;
+}
+.cherry.c1 { bottom: 85px; left: 28%; }
+.cherry.c2 { bottom: 85px; left: 48%; }
+.cherry.c3 { bottom: 85px; left: 68%; }
+.cherry.c4 { bottom: 145px; left: 50%; transform: translateX(-50%); }
+
+/* Nến */
+.candle {
+  position: absolute;
+  bottom: 168px;
+  width: 11px;
+  height: 36px;
+  background: linear-gradient(180deg, #fffaf0 0%, #ffe6a0 100%);
+  border-radius: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+}
+.candle1 { left: 32%; }
+.candle2 { left: 50%; }
+.candle3 { left: 68%; }
+
+.candle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  width: 16px;
+  height: 22px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(circle at 50% 30%, #fff9d0 0%, #ffd65a 40%, #ff9a30 100%);
+  box-shadow: 0 0 16px rgba(255, 200, 80, 0.95);
+  animation: flicker 0.85s ease-in-out infinite alternate;
+}
+.candle2::after { animation-delay: 0.3s; }
+.candle3::after { animation-delay: 0.6s; }
+
+/* Hiệu ứng nổi */
+@keyframes cakeFloat {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-12px); }
+}
+
+/* Hiệu ứng lửa nến */
+@keyframes flicker {
+  from { transform: translateX(-50%) scale(0.88) rotate(-6deg); }
+  to   { transform: translateX(-50%) scale(1.12) rotate(5deg); }
+}
+
+/* Responsive cho mobile */
+@media (max-width: 480px) {
+  .cake {
+    width: 160px;
+    height: 160px;
+  }
+  .cake .base { height: 45px; }
+  .cake .middle { bottom: 40px; height: 35px; }
+  .cake .top { bottom: 70px; height: 28px; }
+}
+
 
 /* Hiệu ứng nổi */
 @keyframes cakeFloat {
@@ -452,10 +556,10 @@
       }
     }
 
-    @keyframes cakeFloat {
-      from { transform: translate(-50%, -50%) translateY(0); }
-      to   { transform: translate(-50%, -50%) translateY(-12px); }
-    }
+        @keyframes cakeFloat {
+        from { transform: translate(-50%, -50%) translateY(0); }
+        to   { transform: translate(-50%, -50%) translateY(-12px); }
+        }
     @keyframes flicker {
       from { transform: translateX(-50%) scale(0.88) rotate(-6deg); }
       to   { transform: translateX(-50%) scale(1.12) rotate(5deg); }
@@ -495,7 +599,7 @@
           <button class="key" data-num="0">0</button>
           <button class="key" data-num="OK">OK</button>
         </div>
-        <div class="error-msg" id="errorMsg"></div>
+        <div class="error-msg" id="errorMsg"></div> 
       </div>
     </div>
   </div>
@@ -557,20 +661,22 @@
       <div class="around-photo p6"><img src="img/your-photo.jpg" onerror="this.style.display='none'" /></div>
 
       <!-- Bánh kem -->
-      <div class="cake">
-        <div class="cake-layer base"></div>
-        <div class="cake-layer middle"></div>
-        <div class="cake-layer top"></div>
-        <div class="icing-drip"></div>
-        <div class="cherry c1"></div>
-        <div class="cherry c2"></div>
-        <div class="cherry c3"></div>
-        <div class="cherry c4"></div>
-        <div class="candle candle1"></div>
-        <div class="candle candle2"></div>
-        <div class="candle candle3"></div>
-      </div>
-    </div>
+   <div class="cake-wrapper">
+  <div class="cake">
+    <div class="cake-layer base"></div>
+    <div class="cake-layer middle"></div>
+    <div class="cake-layer top"></div>
+    <div class="icing-drip"></div>
+    <div class="cherry c1"></div>
+    <div class="cherry c2"></div>
+    <div class="cherry c3"></div>
+    <div class="cherry c4"></div>
+    <div class="candle candle1"></div>
+    <div class="candle candle2"></div>
+    <div class="candle candle3"></div>
+  </div>
+</div>
+
   </div>
 
   <script>
