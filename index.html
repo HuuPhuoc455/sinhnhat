@@ -254,6 +254,96 @@
       z-index: 20;
     }
 
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(55, 17, 34, 0.6);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.28s ease;
+      z-index: 1000;
+    }
+    .lightbox.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .lightbox-card {
+      position: relative;
+      width: min(82vw, 720px);
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 26px;
+      padding: 18px 18px 12px;
+      box-shadow: 0 25px 60px rgba(139, 48, 91, 0.35);
+      border: 4px solid transparent;
+      background-clip: padding-box;
+      overflow: hidden;
+    }
+    .lightbox-card::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ff9bc7, #ffe39d, #99d7ff, #ffb4d9);
+      z-index: -1;
+    }
+
+    .lightbox-box {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 340px;
+      background: linear-gradient(135deg, #fff4f8, #fffaf0);
+      border-radius: 18px;
+      padding: 10px;
+    }
+    .lightbox-image {
+      width: 100%;
+      max-height: 72vh;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 4px solid transparent;
+      background: linear-gradient(white, white) padding-box,
+        linear-gradient(135deg, #ff8fc3, #ffd77f, #7dd7ff) border-box;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      display: block;
+    }
+    .lightbox-cake {
+      width: min(100%, 420px);
+    }
+    .lightbox-title {
+      text-align: center;
+      color: var(--pink-deep);
+      font-weight: 800;
+      margin-top: 10px;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      color: var(--pink-deep);
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
     .scene {
       position: relative;
       width: min(96vw, 540px);
@@ -515,11 +605,28 @@
       transform: scale(0.5);
       transition: all 0.9s cubic-bezier(0.22, 0.9, 0.3, 1);
       z-index: 5;
+      cursor: pointer;
+      border: 4px solid transparent;
+      background-clip: padding-box;
+    }
+    .around-photo::before {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 155, 195, 0.9), rgba(255, 228, 155, 0.9), rgba(120, 204, 255, 0.9));
+      z-index: -1;
+      filter: blur(0.5px);
     }
     .around-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+    }
+    .around-photo:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 16px 30px rgba(255, 107, 157, 0.28);
     }
     .around-photo.show {
       opacity: 1;
@@ -628,6 +735,14 @@
   <div class="photo-page" id="photoPage">
     <h2>Sinh nhật vui vẻ</h2>
 
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+      <div class="lightbox-card">
+        <button class="lightbox-close" aria-label="Đóng ảnh lớn">×</button>
+        <div class="lightbox-box" id="lightboxBox"></div>
+        <div class="lightbox-title" id="lightboxTitle">Hình ảnh</div>
+      </div>
+    </div>
+
     <div class="scene">
       <!-- Rất nhiều hiệu ứng bay lên -->
       <div class="floating-decor" style="left: 5%;  bottom: 30px;  animation-delay: 0s;    font-size: 18px;">⭐</div>
@@ -692,6 +807,64 @@
     const wishCard    = document.getElementById("wishCard");
     const nextBtn     = document.getElementById("nextBtn");
     const bgMusic     = document.getElementById("bgMusic");
+    const lightbox    = document.getElementById("lightbox");
+    const lightboxBox = document.getElementById("lightboxBox");
+    const lightboxTitle = document.getElementById("lightboxTitle");
+
+    function renderCakeMarkup() {
+      return `
+        <div class="cake lightbox-cake">
+          <div class="cake-layer base"></div>
+          <div class="cake-layer middle"></div>
+          <div class="cake-layer top"></div>
+          <div class="icing-drip"></div>
+          <div class="cherry c1"></div>
+          <div class="cherry c2"></div>
+          <div class="cherry c3"></div>
+          <div class="cherry c4"></div>
+          <div class="candle candle1"></div>
+          <div class="candle candle2"></div>
+          <div class="candle candle3"></div>
+        </div>
+      `;
+    }
+
+    function openLightbox(src, title) {
+      lightboxBox.innerHTML = '';
+      if (src) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = title;
+        img.className = 'lightbox-image';
+        lightboxBox.appendChild(img);
+      } else {
+        lightboxBox.innerHTML = renderCakeMarkup();
+      }
+      lightboxTitle.textContent = title;
+      lightbox.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+
+    document.querySelectorAll('.around-photo, .cake-wrapper').forEach((item) => {
+      item.addEventListener('click', () => {
+        const img = item.querySelector('img');
+        if (img) {
+          openLightbox(img.src, 'Ảnh kỷ niệm');
+        } else {
+          openLightbox('', 'Bánh kem sinh nhật');
+        }
+      });
+    });
 
     document.getElementById("keypad").addEventListener("click", (e) => {
       const btn = e.target.closest(".key");
